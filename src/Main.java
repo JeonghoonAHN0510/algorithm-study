@@ -1,66 +1,73 @@
 import java.io.*;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.StringTokenizer;
+import java.util.*;
 
-class Edge {
-    int node;
-    int cost;
-    public Edge(int node, int cost){
-        this.node = node;
-        this.cost = cost;
+class Node {
+    String name;
+    Node left, right;
+    public Node(String name){
+        this.name = name;
+        left = right = null;
     }
 }
 
 public class Main {
     static StringBuilder answer = new StringBuilder();
-    static List<List<Edge>> tree = new ArrayList<>();
-    static boolean[] isVisited;
-    static int nodeNumbers, maxDistance, finalNode;
+    static Map<String, Node> nodeMap = new HashMap<>();
+    static int nodeNumber;
 
     public static void main(String[] args) throws IOException {
         BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
         BufferedWriter bw = new BufferedWriter(new OutputStreamWriter(System.out));
         StringTokenizer st;
 
-        nodeNumbers = Integer.parseInt(br.readLine());  // 노드의 개수
-        for (int i = 0; i <= nodeNumbers; i++) {
-            tree.add(new ArrayList<>());
-        }
-
-        for (int i = 1; i < nodeNumbers; i++) {
+        nodeNumber = Integer.parseInt(br.readLine());
+        for (int i = 0; i < nodeNumber; i++) {
             st = new StringTokenizer(br.readLine());
-            int parentNode = Integer.parseInt(st.nextToken());
-            int childNode = Integer.parseInt(st.nextToken());
-            int edgeWeight = Integer.parseInt(st.nextToken());
-            tree.get(parentNode).add(new Edge(childNode, edgeWeight));
-            tree.get(childNode).add(new Edge(parentNode, edgeWeight));
+            String parentNode = st.nextToken();
+            String leftNode = st.nextToken();
+            String rightNode = st.nextToken();
+
+            Node parent = getNode(parentNode);
+
+            if (!leftNode.equals(".")){
+                Node left = getNode(leftNode);
+                parent.left = left;
+            }
+            if (!rightNode.equals(".")){
+                Node right = getNode(rightNode);
+                parent.right = right;
+            }
         }
 
-        isVisited = new boolean[nodeNumbers + 1];
-        maxDistance = 0;
-        dfs(1, 0);
-
-        isVisited = new boolean[nodeNumbers + 1];
-        maxDistance = 0;
-        dfs(finalNode, 0);
-
-        answer.append(maxDistance);
+        preOrder(nodeMap.get("A"));
+        answer.append("\n");
+        inOrder(nodeMap.get("A"));
+        answer.append("\n");
+        postOrder(nodeMap.get("A"));
 
         bw.write(answer.toString().trim());
         bw.flush();
         bw.close();
     }
-    public static void dfs(int currentNode, int cost){
-        isVisited[currentNode] = true;
-        if (cost > maxDistance) {
-            maxDistance = cost;
-            finalNode = currentNode;
-        }
-        for (Edge currentEdge : tree.get(currentNode)) {
-            if (!isVisited[currentEdge.node]) {
-                dfs(currentEdge.node, cost + currentEdge.cost);
-            }
-        }
+    private static Node getNode(String name) {
+        return nodeMap.computeIfAbsent(name, key -> new Node(key));
+    }
+    static void preOrder(Node node) {
+        if (node == null) return;
+        answer.append(node.name);
+        preOrder(node.left);
+        preOrder(node.right);
+    }
+    static void inOrder(Node node) {
+        if (node == null) return;
+        inOrder(node.left);
+        answer.append(node.name);
+        inOrder(node.right);
+    }
+    static void postOrder(Node node) {
+        if (node == null) return;
+        postOrder(node.left);
+        postOrder(node.right);
+        answer.append(node.name);
     }
 }
