@@ -1,73 +1,57 @@
 import java.io.*;
 import java.util.*;
 
-class Node {
-    String name;
-    Node left, right;
-    public Node(String name){
-        this.name = name;
-        left = right = null;
-    }
-}
-
 public class Main {
     static StringBuilder answer = new StringBuilder();
-    static Map<String, Node> nodeMap = new HashMap<>();
-    static int nodeNumber;
+    static int[] parent;
+    static int n, m;
 
     public static void main(String[] args) throws IOException {
         BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
         BufferedWriter bw = new BufferedWriter(new OutputStreamWriter(System.out));
         StringTokenizer st;
 
-        nodeNumber = Integer.parseInt(br.readLine());
-        for (int i = 0; i < nodeNumber; i++) {
-            st = new StringTokenizer(br.readLine());
-            String parentNode = st.nextToken();
-            String leftNode = st.nextToken();
-            String rightNode = st.nextToken();
+        st = new StringTokenizer(br.readLine());
+        n = Integer.parseInt(st.nextToken());       // 집합의 개수
+        m = Integer.parseInt(st.nextToken());       // 연산의 개수
 
-            Node parent = getNode(parentNode);
-
-            if (!leftNode.equals(".")){
-                Node left = getNode(leftNode);
-                parent.left = left;
-            }
-            if (!rightNode.equals(".")){
-                Node right = getNode(rightNode);
-                parent.right = right;
-            }
+        parent = new int[n + 1];
+        for (int i = 0; i <= n; i++) {
+            parent[i] = i;
         }
 
-        preOrder(nodeMap.get("A"));
-        answer.append("\n");
-        inOrder(nodeMap.get("A"));
-        answer.append("\n");
-        postOrder(nodeMap.get("A"));
+        for (int i = 0; i < m; i++) {
+            st = new StringTokenizer(br.readLine());
+            int isPrint = Integer.parseInt(st.nextToken());
+            int a = Integer.parseInt(st.nextToken());
+            int b = Integer.parseInt(st.nextToken());
+
+            if (isPrint == 0){
+                union(a, b);
+            } else {
+                if (find(a) == find(b)){
+                    answer.append("YES").append("\n");
+                } else {
+                    answer.append("NO").append("\n");
+                }
+            }
+        }
 
         bw.write(answer.toString().trim());
         bw.flush();
         bw.close();
     }
-    private static Node getNode(String name) {
-        return nodeMap.computeIfAbsent(name, key -> new Node(key));
+    public static int find(int x){
+        if (x == parent[x]){
+            return x;
+        }
+        return parent[x] = find(parent[x]);
     }
-    static void preOrder(Node node) {
-        if (node == null) return;
-        answer.append(node.name);
-        preOrder(node.left);
-        preOrder(node.right);
-    }
-    static void inOrder(Node node) {
-        if (node == null) return;
-        inOrder(node.left);
-        answer.append(node.name);
-        inOrder(node.right);
-    }
-    static void postOrder(Node node) {
-        if (node == null) return;
-        postOrder(node.left);
-        postOrder(node.right);
-        answer.append(node.name);
+    public static void union(int a, int b){
+        int rootA = find(a);
+        int rootB = find(b);
+        if (rootA != rootB){
+            parent[rootB] = rootA;
+        }
     }
 }
