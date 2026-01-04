@@ -11,30 +11,40 @@ public class Main {
         BufferedWriter bw = new BufferedWriter(new OutputStreamWriter(System.out));
         StringTokenizer st;
 
-        st = new StringTokenizer(br.readLine());
-        n = Integer.parseInt(st.nextToken());       // 집합의 개수
-        m = Integer.parseInt(st.nextToken());       // 연산의 개수
+        n = Integer.parseInt(br.readLine());       // 도시의 개수
+        m = Integer.parseInt(br.readLine());       // 여행계획의 도시 개수
 
         parent = new int[n + 1];
         for (int i = 0; i <= n; i++) {
             parent[i] = i;
         }
 
-        for (int i = 0; i < m; i++) {
+        for (int i = 1; i <= n; i++) {
             st = new StringTokenizer(br.readLine());
-            int isPrint = Integer.parseInt(st.nextToken());
-            int a = Integer.parseInt(st.nextToken());
-            int b = Integer.parseInt(st.nextToken());
-
-            if (isPrint == 0){
-                union(a, b);
-            } else {
-                if (find(a) == find(b)){
-                    answer.append("YES").append("\n");
-                } else {
-                    answer.append("NO").append("\n");
+            for (int j = 1; j <= n; j++) {
+                int isConnect = Integer.parseInt(st.nextToken());
+                if (isConnect == 1) {
+                    union(i, j);
                 }
             }
+        }
+
+        st = new StringTokenizer(br.readLine());
+        int start = Integer.parseInt(st.nextToken());
+        boolean isPossible = true;
+        for (int i = 1; i < m; i++) {
+            int nextCity = Integer.parseInt(st.nextToken());
+            if (find(start) != find(nextCity)){
+                isPossible = false;
+                break;
+            }
+            start = nextCity;
+        }
+
+        if (isPossible) {
+            answer.append("YES");
+        } else {
+            answer.append("NO");
         }
 
         bw.write(answer.toString().trim());
