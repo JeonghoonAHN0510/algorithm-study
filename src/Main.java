@@ -2,66 +2,58 @@ import java.io.*;
 import java.util.*;
 
 public class Main {
-    static StringBuilder answer = new StringBuilder();
-    static int[] parent;
-    static int n, m;
+	static StringBuilder answer = new StringBuilder();
+	static List<Integer>[] graph;
+	static boolean[] visited;
+	static int result;
 
-    public static void main(String[] args) throws IOException {
-        BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
-        BufferedWriter bw = new BufferedWriter(new OutputStreamWriter(System.out));
-        StringTokenizer st;
+	public static void main(String[] args) throws IOException {
+		BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
+		BufferedWriter bw = new BufferedWriter(new OutputStreamWriter(System.out));
+		StringTokenizer st;
 
-        n = Integer.parseInt(br.readLine());       // 도시의 개수
-        m = Integer.parseInt(br.readLine());       // 여행계획의 도시 개수
+		int T = Integer.parseInt(br.readLine());    // 테스트 케이스 수
+		for (int t = 1; t <= T; t++) {
+			st = new StringTokenizer(br.readLine());
+			int n = Integer.parseInt(st.nextToken());    // 국가의 수
+			int m = Integer.parseInt(st.nextToken());    // 비행기의 종류
 
-        parent = new int[n + 1];
-        for (int i = 0; i <= n; i++) {
-            parent[i] = i;
-        }
+			graph = new ArrayList[n + 1];
+			for (int i = 1; i <= n; i++) {
+				graph[i] = new ArrayList<>();
+			}
 
-        for (int i = 1; i <= n; i++) {
-            st = new StringTokenizer(br.readLine());
-            for (int j = 1; j <= n; j++) {
-                int isConnect = Integer.parseInt(st.nextToken());
-                if (isConnect == 1) {
-                    union(i, j);
-                }
-            }
-        }
+			for (int i = 0; i < m; i++) {
+				st = new StringTokenizer(br.readLine());
+				int u = Integer.parseInt(st.nextToken());
+				int v = Integer.parseInt(st.nextToken());
+				graph[u].add(v);
+				graph[v].add(u);
+			}
+			visited = new boolean[n + 1];
+			result = 0;
+			bfs(1);
+			answer.append(result).append("\n");
+		}
 
-        st = new StringTokenizer(br.readLine());
-        int start = Integer.parseInt(st.nextToken());
-        boolean isPossible = true;
-        for (int i = 1; i < m; i++) {
-            int nextCity = Integer.parseInt(st.nextToken());
-            if (find(start) != find(nextCity)){
-                isPossible = false;
-                break;
-            }
-            start = nextCity;
-        }
+		bw.write(answer.toString().trim());
+		bw.flush();
+		bw.close();
+	}
 
-        if (isPossible) {
-            answer.append("YES");
-        } else {
-            answer.append("NO");
-        }
-
-        bw.write(answer.toString().trim());
-        bw.flush();
-        bw.close();
-    }
-    public static int find(int x){
-        if (x == parent[x]){
-            return x;
-        }
-        return parent[x] = find(parent[x]);
-    }
-    public static void union(int a, int b){
-        int rootA = find(a);
-        int rootB = find(b);
-        if (rootA != rootB){
-            parent[rootB] = rootA;
-        }
-    }
+	public static void bfs(int start) {
+		Queue<Integer> queue = new LinkedList<>();
+		queue.add(start);
+		visited[start] = true;
+		while (!queue.isEmpty()) {
+			int current = queue.poll();
+			for (int next : graph[current]) {
+				if (!visited[next]) {
+					visited[next] = true;
+					queue.add(next);
+					result++;
+				}
+			}
+		}
+	}
 }
