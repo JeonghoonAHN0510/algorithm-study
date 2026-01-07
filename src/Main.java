@@ -1,82 +1,56 @@
 import java.io.*;
 import java.util.*;
 
-class Edge implements Comparable<Edge> {
-	int start;
-	int end;
-	int weight;
-
-	public Edge(int start, int end, int weight) {
-		this.start = start;
-		this.end = end;
-		this.weight = weight;
-	}
-
-	@Override
-	public int compareTo(Edge o) {
-		return this.weight - o.weight;
-	}
-}
-
 public class Main {
-	static StringBuilder answer = new StringBuilder();
-	static List<Edge> edges = new ArrayList<>();
-	static int[] parent;
+    static StringBuilder answer = new StringBuilder();
+    static char[][] chessBoard;
+	static int[][] sumBoard;
+    static int N, M, K;
 
-	public static void main(String[] args) throws IOException {
-		BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
-		BufferedWriter bw = new BufferedWriter(new OutputStreamWriter(System.out));
-		StringTokenizer st;
+    public static void main (String[] args) throws IOException {
+        BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
+        BufferedWriter bw = new BufferedWriter(new OutputStreamWriter(System.out));
+        StringTokenizer st;
 
-		st = new StringTokenizer(br.readLine());
-		int V = Integer.parseInt(st.nextToken());    // 정점의 개수
-		int E = Integer.parseInt(st.nextToken());    // 간선의 개수
-		for (int i = 0; i < E; i++) {
-			st = new StringTokenizer(br.readLine());
-			int A = Integer.parseInt(st.nextToken());
-			int B = Integer.parseInt(st.nextToken());
-			int C = Integer.parseInt(st.nextToken());
-			edges.add(new Edge(A, B, C));
-		}
+        st = new StringTokenizer(br.readLine());
+        N = Integer.parseInt(st.nextToken());
+        M = Integer.parseInt(st.nextToken());
+        K = Integer.parseInt(st.nextToken());
+		chessBoard = new char[N][M];
+		sumBoard = new int[N + 1][M + 1];
 
-		Collections.sort(edges);
+		for (int i = 0; i < N; i++) {
+			String line = br.readLine();
+			for (int j = 0; j < M; j++) {
+				chessBoard[i][j] = line.charAt(j);
 
-		parent = new int[V + 1];
-		for (int i = 1; i <= V; i++) {
-			parent[i] = i;
-		}
+				boolean isBlack = (i + j) % 2 == 0;
+				int value = 0;
 
-		int minWeight = 0;
-		int edgeCount = 0;
-
-		for (Edge edge : edges) {
-			if (find(edge.start) != find(edge.end)) {
-				union(edge.start, edge.end);
-				minWeight += edge.weight;
-				edgeCount++;
-
-				if (edgeCount == V - 1) break;
+				if (isBlack) {
+					if (chessBoard[i][j] != 'B') value = 1;
+				} else {
+					if (chessBoard[i][j] != 'W') value = 1;
+				}
+				sumBoard[i + 1][j + 1] = sumBoard[i][j + 1] + sumBoard[i + 1][j] - sumBoard[i][j] + value;
 			}
 		}
 
-		answer.append(minWeight);
+		int minCount = Integer.MAX_VALUE;
+		for (int i = K; i <= N; i++) {
+			for (int j = K; j <= M; j++) {
+				int countBlack = sumBoard[i][j] - sumBoard[i - K][j] - sumBoard[i][j - K] + sumBoard[i - K][j - K];
 
-		bw.write(answer.toString().trim());
-		bw.flush();
-		bw.close();
-	}
+				int countWhite = (K * K) - countBlack;
 
-	public static int find(int x) {
-		if (parent[x] == x)
-			return x;
-		return parent[x] = find(parent[x]);
-	}
-
-	public static void union(int x, int y) {
-		int rootX = find(x);
-		int rootY = find(y);
-		if (rootX != rootY) {
-			parent[rootY] = rootX;
+				minCount = Math.min(minCount, Math.min(countBlack, countWhite));
+			}
 		}
-	}
+
+		answer.append(minCount);
+
+        bw.write(answer.toString().trim());
+        bw.flush();
+        bw.close();
+    }
 }
