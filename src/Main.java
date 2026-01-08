@@ -3,54 +3,67 @@ import java.util.*;
 
 public class Main {
     static StringBuilder answer = new StringBuilder();
-    static char[][] chessBoard;
-	static int[][] sumBoard;
-    static int N, M, K;
+    static final int INF = 9900001;
+    static int[][] result;
 
     public static void main (String[] args) throws IOException {
         BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
         BufferedWriter bw = new BufferedWriter(new OutputStreamWriter(System.out));
         StringTokenizer st;
 
-        st = new StringTokenizer(br.readLine());
-        N = Integer.parseInt(st.nextToken());
-        M = Integer.parseInt(st.nextToken());
-        K = Integer.parseInt(st.nextToken());
-		chessBoard = new char[N][M];
-		sumBoard = new int[N + 1][M + 1];
+        int N = Integer.parseInt(br.readLine());
+        int M = Integer.parseInt(br.readLine());
+        result = new int[N + 1][N + 1];
 
-		for (int i = 0; i < N; i++) {
-			String line = br.readLine();
-			for (int j = 0; j < M; j++) {
-				chessBoard[i][j] = line.charAt(j);
+        for (int i = 1; i <= N; i++) {
+            for (int j = 1; j <= N; j++) {
+                if (i != j) {
+                    result[i][j] = INF;
+                }
+            }
+        }
 
-				boolean isBlack = (i + j) % 2 == 0;
-				int value = 0;
+        for (int i = 0; i < M; i++) {
+            st = new StringTokenizer(br.readLine());
+            int a = Integer.parseInt(st.nextToken());
+            int b = Integer.parseInt(st.nextToken());
+            int c = Integer.parseInt(st.nextToken());
 
-				if (isBlack) {
-					if (chessBoard[i][j] != 'B') value = 1;
-				} else {
-					if (chessBoard[i][j] != 'W') value = 1;
-				}
-				sumBoard[i + 1][j + 1] = sumBoard[i][j + 1] + sumBoard[i + 1][j] - sumBoard[i][j] + value;
-			}
-		}
+            result[a][b] = Math.min(result[a][b], c);
+        }
 
-		int minCount = Integer.MAX_VALUE;
-		for (int i = K; i <= N; i++) {
-			for (int j = K; j <= M; j++) {
-				int countBlack = sumBoard[i][j] - sumBoard[i - K][j] - sumBoard[i][j - K] + sumBoard[i - K][j - K];
+        floydWarshall(N);
 
-				int countWhite = (K * K) - countBlack;
-
-				minCount = Math.min(minCount, Math.min(countBlack, countWhite));
-			}
-		}
-
-		answer.append(minCount);
+        for (int i = 1; i <= N; i++) {
+            for (int j = 1; j <= N; j++) {
+                if (result[i][j] == INF) {
+                    answer.append("0");
+                } else {
+                    answer.append(result[i][j]);
+                }
+                answer.append(" ");
+            }
+            answer.append("\n");
+        }
 
         bw.write(answer.toString().trim());
         bw.flush();
         bw.close();
+    }
+
+    public static void floydWarshall (int n) {
+        for (int i = 1; i <= n; i++) {
+            for (int j = 1; j <= n; j++) {
+                if (i != j) {
+                    for (int k = 1; k <= n; k++) {
+                        if (i != k && j != k) {
+                            if (result[j][k] > result[j][i] + result[i][k]) {
+                                result[j][k] = result[j][i] + result[i][k];
+                            }
+                        }
+                    }
+                }
+            }
+        }
     }
 }
