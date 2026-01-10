@@ -4,46 +4,45 @@ import java.util.*;
 public class Main {
     static StringBuilder answer = new StringBuilder();
     static final int INF = 9900001;
-    static int[][] result;
+    static int[][] dist;
 
     public static void main (String[] args) throws IOException {
         BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
         BufferedWriter bw = new BufferedWriter(new OutputStreamWriter(System.out));
         StringTokenizer st;
 
-        int N = Integer.parseInt(br.readLine());
-        int M = Integer.parseInt(br.readLine());
-        result = new int[N + 1][N + 1];
+        st = new StringTokenizer(br.readLine());
+        int V = Integer.parseInt(st.nextToken());
+        int E = Integer.parseInt(st.nextToken());
+        dist = new int[V + 1][V + 1];
 
-        for (int i = 1; i <= N; i++) {
-            for (int j = 1; j <= N; j++) {
-                if (i != j) {
-                    result[i][j] = INF;
-                }
+        for (int i = 1; i <= V; i++) {
+            for (int j = 1; j <= V; j++) {
+                dist[i][j] = INF;
             }
         }
 
-        for (int i = 0; i < M; i++) {
+        for (int i = 0; i < E; i++) {
             st = new StringTokenizer(br.readLine());
             int a = Integer.parseInt(st.nextToken());
             int b = Integer.parseInt(st.nextToken());
             int c = Integer.parseInt(st.nextToken());
 
-            result[a][b] = Math.min(result[a][b], c);
+            dist[a][b] = Math.min(dist[a][b], c);
         }
 
-        floydWarshall(N);
+        floydWarshall(V);
 
-        for (int i = 1; i <= N; i++) {
-            for (int j = 1; j <= N; j++) {
-                if (result[i][j] == INF) {
-                    answer.append("0");
-                } else {
-                    answer.append(result[i][j]);
-                }
-                answer.append(" ");
-            }
-            answer.append("\n");
+        int result = INF;
+
+        for (int i = 1; i <= V; i++) {
+            result = Math.min(result, dist[i][i]);
+        }
+
+        if (result == INF) {
+            answer.append("-1");
+        } else {
+            answer.append(result);
         }
 
         bw.write(answer.toString().trim());
@@ -52,15 +51,11 @@ public class Main {
     }
 
     public static void floydWarshall (int n) {
-        for (int i = 1; i <= n; i++) {
-            for (int j = 1; j <= n; j++) {
-                if (i != j) {
-                    for (int k = 1; k <= n; k++) {
-                        if (i != k && j != k) {
-                            if (result[j][k] > result[j][i] + result[i][k]) {
-                                result[j][k] = result[j][i] + result[i][k];
-                            }
-                        }
+        for (int k = 1; k <= n; k++) {
+            for (int i = 1; i <= n; i++) {
+                for (int j = 1; j <= n; j++) {
+                    if (dist[i][j] > dist[i][k] + dist[k][j]) {
+                        dist[i][j] = dist[i][k] + dist[k][j];
                     }
                 }
             }
