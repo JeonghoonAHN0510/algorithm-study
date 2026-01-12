@@ -3,62 +3,45 @@ import java.util.*;
 
 public class Main {
     static StringBuilder answer = new StringBuilder();
-    static final int INF = 9900001;
-    static int[][] dist;
 
     public static void main (String[] args) throws IOException {
         BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
         BufferedWriter bw = new BufferedWriter(new OutputStreamWriter(System.out));
         StringTokenizer st;
 
-        st = new StringTokenizer(br.readLine());
-        int V = Integer.parseInt(st.nextToken());
-        int E = Integer.parseInt(st.nextToken());
-        dist = new int[V + 1][V + 1];
+        int N = Integer.parseInt(br.readLine());        // N개의 정수
+        int[] array = new int[N];
 
-        for (int i = 1; i <= V; i++) {
-            for (int j = 1; j <= V; j++) {
-                dist[i][j] = INF;
+        st = new StringTokenizer(br.readLine());
+        for (int i = 0; i < N; i++) {
+            array[i] = Integer.parseInt(st.nextToken());
+        }
+
+        Arrays.sort(array);
+
+        int X = Integer.parseInt(br.readLine());
+
+        int left = 0;
+        int right = N - 1;
+        int count = 0;
+        while (left < right) {
+            int sum = array[left] + array[right];
+
+            if (sum == X) {
+                count++;
+                left++;
+                right--;
+            } else if (sum < X) {
+                left++;
+            } else {
+                right--;
             }
         }
 
-        for (int i = 0; i < E; i++) {
-            st = new StringTokenizer(br.readLine());
-            int a = Integer.parseInt(st.nextToken());
-            int b = Integer.parseInt(st.nextToken());
-            int c = Integer.parseInt(st.nextToken());
-
-            dist[a][b] = Math.min(dist[a][b], c);
-        }
-
-        floydWarshall(V);
-
-        int result = INF;
-
-        for (int i = 1; i <= V; i++) {
-            result = Math.min(result, dist[i][i]);
-        }
-
-        if (result == INF) {
-            answer.append("-1");
-        } else {
-            answer.append(result);
-        }
+        answer.append(count);
 
         bw.write(answer.toString().trim());
         bw.flush();
         bw.close();
-    }
-
-    public static void floydWarshall (int n) {
-        for (int k = 1; k <= n; k++) {
-            for (int i = 1; i <= n; i++) {
-                for (int j = 1; j <= n; j++) {
-                    if (dist[i][j] > dist[i][k] + dist[k][j]) {
-                        dist[i][j] = dist[i][k] + dist[k][j];
-                    }
-                }
-            }
-        }
     }
 }
