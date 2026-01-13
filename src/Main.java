@@ -9,36 +9,24 @@ public class Main {
         BufferedWriter bw = new BufferedWriter(new OutputStreamWriter(System.out));
         StringTokenizer st;
 
-        int N = Integer.parseInt(br.readLine());        // N개의 정수
+        int N = Integer.parseInt(br.readLine());
         int[] array = new int[N];
+        int[] dp = new int[N];
 
         st = new StringTokenizer(br.readLine());
         for (int i = 0; i < N; i++) {
             array[i] = Integer.parseInt(st.nextToken());
         }
 
-        Arrays.sort(array);
+        dp[0] = array[0];
+        int maxValue = array[0];
 
-        int X = Integer.parseInt(br.readLine());
-
-        int left = 0;
-        int right = N - 1;
-        int count = 0;
-        while (left < right) {
-            int sum = array[left] + array[right];
-
-            if (sum == X) {
-                count++;
-                left++;
-                right--;
-            } else if (sum < X) {
-                left++;
-            } else {
-                right--;
-            }
+        for (int i = 1; i < N; i++) {
+            dp[i] = Math.max(dp[i - 1] + array[i], array[i]);
+            maxValue = Math.max(maxValue, dp[i]);
         }
 
-        answer.append(count);
+        answer.append(maxValue);
 
         bw.write(answer.toString().trim());
         bw.flush();
