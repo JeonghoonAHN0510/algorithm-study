@@ -10,28 +10,36 @@ public class Main {
         StringTokenizer st;
 
         int N = Integer.parseInt(br.readLine());
-        int[][] costs = new int[N][3];
-        int[][] dp = new int[N][3];
-
+        int[][] triangle = new int[N][N];
+        int[][] dp = new int[N][N];
         for (int i = 0; i < N; i++) {
             st = new StringTokenizer(br.readLine());
-            for (int j = 0; j < 3; j++) {
+            for (int j = 0; j <= i; j++) {
                 int cost = Integer.parseInt(st.nextToken());
-                costs[i][j] = cost;
+                triangle[i][j] = cost;
             }
         }
 
-        dp[0][0] = costs[0][0];
-        dp[0][1] = costs[0][1];
-        dp[0][2] = costs[0][2];
+        dp[0][0] = triangle[0][0];
 
         for (int i = 1; i < N; i++) {
-            dp[i][0] = costs[i][0] + Math.min(dp[i - 1][1], dp[i - 1][2]);
-            dp[i][1] = costs[i][1] + Math.min(dp[i - 1][0], dp[i - 1][2]);
-            dp[i][2] = costs[i][2] + Math.min(dp[i - 1][0], dp[i - 1][1]);
+            for (int j = 0; j <= i; j++) {
+                if (j == 0) {
+                    dp[i][j] = triangle[i][j] + dp[i - 1][j];
+                } else if (j == i) {
+                    dp[i][j] = triangle[i][j] + dp[i - 1][j - 1];
+                } else {
+                    dp[i][j] = triangle[i][j] + Math.max(dp[i - 1][j], dp[i - 1][j - 1]);
+                }
+            }
         }
 
-        answer.append(Math.min(dp[N - 1][0], Math.min(dp[N - 1][1], dp[N - 1][2])));
+        int MaxValue = Integer.MIN_VALUE;
+        for (int i = 0; i < N; i++) {
+            MaxValue = Math.max(MaxValue, dp[N - 1][i]);
+        }
+
+        answer.append(MaxValue);
 
         bw.write(answer.toString().trim());
         bw.flush();
