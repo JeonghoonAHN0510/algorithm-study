@@ -9,35 +9,31 @@ public class Main {
         BufferedWriter bw = new BufferedWriter(new OutputStreamWriter(System.out));
         StringTokenizer st;
 
-        st = new StringTokenizer(br.readLine());
-        int N = Integer.parseInt(st.nextToken());   // 날짜의 수
-        int K = Integer.parseInt(st.nextToken());   // 연속적인 날짜의 수
-        int[] PrefixSum = new int[N];
-
-        st = new StringTokenizer(br.readLine());
-        PrefixSum[0] = Integer.parseInt(st.nextToken());
-        for (int i = 1; i < N; i++) {
-            int input = Integer.parseInt(st.nextToken());
-            PrefixSum[i] = input + PrefixSum[i - 1];
-        }
-
-        int[] result = new int[N - K + 1];
-        int interval = K;
-        for (int i = 0; i < N - K + 1; i++) {
-            if (i == 0) {
-                result[i] = PrefixSum[interval - 1];
-            } else {
-                result[i] = PrefixSum[interval - 1] - PrefixSum[i - 1];
+        String S = br.readLine();
+        int SLength = S.length();
+        int q = Integer.parseInt(br.readLine());
+        int[][] alphabets = new int[SLength][26];
+        alphabets[0][S.charAt(0) - 'a'] = 1;
+        for (int i = 1; i < SLength; i++) {
+            for (int j = 0; j < 26; j++) {
+                alphabets[i][j] = alphabets[i - 1][j];
             }
-            interval++;
+            alphabets[i][S.charAt(i) - 'a']++;
         }
 
-        int maxValue = Integer.MIN_VALUE;
-        for (int i = 0; i < result.length; i++) {
-            maxValue = Math.max(maxValue, result[i]);
-        }
+        for (int i = 0; i < q; i++) {
+            st = new StringTokenizer(br.readLine());
+            char alphabet = st.nextToken().charAt(0);
+            int check = alphabet - 'a';
+            int l = Integer.parseInt(st.nextToken());
+            int r = Integer.parseInt(st.nextToken());
 
-        answer.append(maxValue);
+            if (l == 0) {
+                answer.append(alphabets[r][check]).append("\n");
+            } else {
+                answer.append(alphabets[r][check] - alphabets[l - 1][check]).append("\n");
+            }
+        }
 
         bw.write(answer.toString().trim());
         bw.flush();
