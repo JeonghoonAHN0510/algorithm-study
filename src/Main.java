@@ -9,31 +9,30 @@ public class Main {
         BufferedWriter bw = new BufferedWriter(new OutputStreamWriter(System.out));
         StringTokenizer st;
 
-        String S = br.readLine();
-        int SLength = S.length();
-        int q = Integer.parseInt(br.readLine());
-        int[][] alphabets = new int[SLength][26];
-        alphabets[0][S.charAt(0) - 'a'] = 1;
-        for (int i = 1; i < SLength; i++) {
-            for (int j = 0; j < 26; j++) {
-                alphabets[i][j] = alphabets[i - 1][j];
-            }
-            alphabets[i][S.charAt(i) - 'a']++;
-        }
+        st = new StringTokenizer(br.readLine());
+        int N = Integer.parseInt(st.nextToken());   // 동전 종류 N
+        int K = Integer.parseInt(st.nextToken());   // 목표 K
+        int[] coins = new int[N];
 
-        for (int i = 0; i < q; i++) {
-            st = new StringTokenizer(br.readLine());
-            char alphabet = st.nextToken().charAt(0);
-            int check = alphabet - 'a';
-            int l = Integer.parseInt(st.nextToken());
-            int r = Integer.parseInt(st.nextToken());
+        int coinCount = 0;
 
-            if (l == 0) {
-                answer.append(alphabets[r][check]).append("\n");
-            } else {
-                answer.append(alphabets[r][check] - alphabets[l - 1][check]).append("\n");
+        for (int i = 0; i < N; i++) {
+            int coin = Integer.parseInt(br.readLine());
+            if (coin <= K) {
+                coins[i] = coin;
+                coinCount++;
             }
         }
+
+        int result = 0;
+
+        for (int i = coinCount - 1; i >= 0; i--) {
+            result += K / coins[i];
+
+            K = K % coins[i];
+        }
+
+        answer.append(result);
 
         bw.write(answer.toString().trim());
         bw.flush();
